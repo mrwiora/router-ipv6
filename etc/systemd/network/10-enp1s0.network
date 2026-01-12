@@ -1,0 +1,37 @@
+[Match]
+Name=enp1s0
+
+[Network]
+# LAN interface - advertises ONLY delegated prefix from WAN1
+# No ULA - clients get one address from delegated prefix
+Address=172.17.0.254/24
+IPv6AcceptRA=no
+IPv6SendRA=yes
+IPv6Forwarding=yes
+DHCPPrefixDelegation=yes
+
+[IPv6SendRA]
+# Enable router advertisements on LAN
+Managed=no
+OtherInformation=no
+RouterLifetimeSec=1800
+
+[DHCPPrefixDelegation]
+# Receive and advertise delegated prefix from WAN1
+SubnetId=0
+Announce=yes
+Assign=yes
+Token=::1
+
+[RoutingPolicyRule]
+# Primary: Route delegated prefix traffic via WAN2 (NAT66) - higher priority
+From=2a00:1f:c0:9bfa::/64
+Table=200
+Priority=100
+
+[RoutingPolicyRule]
+# Fallback: Use WAN1 (native) if WAN2 is down - lower priority
+From=2a00:1f:c0:9bfa::/64
+Table=100
+Priority=200
+

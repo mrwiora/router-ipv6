@@ -1,0 +1,32 @@
+[Match]
+Name=enp7s0
+
+[Network]
+# WAN1 with prefix delegation
+DHCP=yes
+IPv6AcceptRA=yes
+IPv6Forwarding=yes
+
+[DHCPv6]
+# Request prefix delegation (/63)
+PrefixDelegationHint=::/63
+UseAddress=yes
+RouteMetric=300
+
+[DHCPv6PrefixDelegation]
+# Delegate subnet 0 to LAN
+SubnetId=0
+Announce=no
+Assign=no
+
+[IPv6AcceptRA]
+DHCPv6Client=always
+UseAutonomousPrefix=no
+RouteTable=100
+
+[Route]
+# Add default route to table 100 (fallback)
+Gateway=_dhcp6
+Table=100
+Metric=300
+
