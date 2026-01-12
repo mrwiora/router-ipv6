@@ -24,14 +24,38 @@ Assign=yes
 Token=::1
 
 [RoutingPolicyRule]
-# IPv4: Keep local LAN traffic on LAN (highest priority)
+# IPv4: Traffic TO router's LAN IP must use main table (highest priority)
+To=172.17.0.254
+Table=main
+Priority=10
+
+[RoutingPolicyRule]
+# IPv4: Traffic TO LAN subnet must use main table (prevent policy routing responses)
+To=172.17.0.0/24
+Table=main
+Priority=20
+
+[RoutingPolicyRule]
+# IPv6: Traffic TO router's LAN IPv6 address must use main table (highest priority)
+To=2a00:1f:c0:9bfa::1/128
+Table=main
+Priority=10
+
+[RoutingPolicyRule]
+# IPv6: Traffic TO LAN subnet must use main table (prevent policy routing responses)
+To=2a00:1f:c0:9bfa::/64
+Table=main
+Priority=20
+
+[RoutingPolicyRule]
+# IPv4: Keep local LAN traffic on LAN (source and destination both in LAN)
 From=172.17.0.0/24
 To=172.17.0.0/24
 Table=main
 Priority=50
 
 [RoutingPolicyRule]
-# IPv6: Keep local LAN traffic on LAN (highest priority)
+# IPv6: Keep local LAN traffic on LAN (source and destination both in LAN)
 From=2a00:1f:c0:9bfa::/64
 To=2a00:1f:c0:9bfa::/64
 Table=main
