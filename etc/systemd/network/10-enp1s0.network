@@ -30,6 +30,18 @@ Table=main
 Priority=20
 
 [RoutingPolicyRule]
+# IPv4: Traffic TO WAN1 local network must use main table (keep gateway reachable)
+To=172.17.254.0/24
+Table=main
+Priority=20
+
+[RoutingPolicyRule]
+# IPv4: Traffic TO WAN2 local network must use main table (keep gateway reachable)
+To=192.168.8.0/24
+Table=main
+Priority=20
+
+[RoutingPolicyRule]
 # IPv6 Primary: Route traffic from LAN via WAN2 (NAT66) - higher priority
 IncomingInterface=enp1s0
 Family=ipv6

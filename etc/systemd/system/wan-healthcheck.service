@@ -1,0 +1,31 @@
+[Unit]
+Description=WAN Health Check and Automatic Failover
+After=network-online.target systemd-networkd.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/wan-healthcheck.sh
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wan-healthcheck
+
+# Security hardening
+ProtectSystem=strict
+ProtectHome=yes
+NoNewPrivileges=false
+PrivateTmp=yes
+
+# Allow network operations and route manipulation
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
+
+# Allow writing to /var/run and /var/log
+ReadWritePaths=/var/run /var/log
+
+[Install]
+WantedBy=multi-user.target

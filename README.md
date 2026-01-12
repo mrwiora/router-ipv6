@@ -47,6 +47,8 @@ The routing policy rules ensure seamless failover:
 
 When WAN2 goes down, the routing policies automatically switch to WAN1 without manual intervention.
 
+**Important**: The configuration includes exclusion rules (priority 20) that ensure traffic destined for WAN local networks (172.17.254.0/24 and 192.168.8.0/24) always uses the main routing table. This keeps both WAN gateways reachable even during failover, allowing you to access devices on those networks.
+
 ### 2. NAT Configuration
 #### IPv4 NAT (NAT44)
 - Both WAN interfaces perform masquerading for LAN traffic
@@ -160,6 +162,96 @@ networkctl status enp8s0
 - New connections automatically use WAN2 again (priority 100)
 - Established connections via WAN1 continue until they close
 
+## Manual Failover Control
+
+The included `failover-control.sh` script allows you to manually trigger failover without taking interfaces down. This is useful because:
+- **Problem**: Taking an interface down (`ip link set enp8s0 down`) triggers failover BUT makes devices on that network unreachable
+- **Solution**: Flush the routing table instead, which triggers failover while keeping the interface UP
+
+### Usage
+
+```bash
+# Trigger manual failover to WAN1 (keeps WAN2 interface up for local access)
+sudo ./failover-control.sh failover
+
+# Check current routing status
+sudo ./failover-control.sh status
+
+# Restore WAN2 as primary
+sudo ./failover-control.sh restore
+
+# Test specific interface connectivity
+sudo ./failover-control.sh test-wan1
+sudo ./failover-control.sh test-wan2
+```
+
+### How It Works
+
+1. **Failover command**: Flushes routes from table 200 (WAN2), causing policy routing to fall through to table 100 (WAN1)
+2. **Interface stays UP**: WAN2 interface remains operational, allowing direct access to 192.168.8.0/24 network
+3. **Both gateways reachable**: The priority 20 routing policy rules ensure both WAN gateways remain accessible:
+   - Traffic TO 172.17.254.0/24 → main table (direct route via enp7s0)
+   - Traffic TO 192.168.8.0/24 → main table (direct route via enp8s0)
+   - Traffic FROM LAN to internet → table 200 or 100 (policy routing)
+
+### Example
+
+```bash
+# Before failover
+$ sudo ./failover-control.sh status
+Interface Status:
+  enp7s0: UP
+  enp8s0: UP
+
+Active Routes:
+  IPv4 (to 8.8.8.8): via enp8s0 (Primary)
+
+Local Connectivity:
+  172.17.254.1 (enp7s0 gateway): REACHABLE
+  192.168.8.1 (enp8s0 gateway): REACHABLE
+
+# Trigger failover
+$ sudo ./failover-control.sh failover
+Forcing failover to WAN1 (enp7s0)...
+✓ Failover complete
+  - Traffic now routes via WAN1 (enp7s0)
+  - Interface enp8s0 remains UP and locally accessible
+  - You can still reach 192.168.8.1 and devices on 192.168.8.0/24
+
+Active Routes:
+  IPv4 (to 8.8.8.8): via enp7s0 (Failover)
+
+Local Connectivity:
+  172.17.254.1 (enp7s0 gateway): REACHABLE
+  192.168.8.1 (enp8s0 gateway): REACHABLE  ← Still reachable!
+
+# You can still ping/access devices on WAN2's network
+$ ping 192.168.8.1
+PING 192.168.8.1 56(84) bytes of data.
+64 bytes from 192.168.8.1: icmp_seq=1 ttl=64 time=0.5 ms
+```
+
+## Automated Health Monitoring (Optional)
+
+For automatic failover based on connectivity checks, you can use the included `wan-healthcheck.sh` script and systemd service:
+
+```bash
+# Install the health check script
+sudo cp wan-healthcheck.sh /usr/local/bin/
+sudo chmod +x /usr/local/bin/wan-healthcheck.sh
+
+# Install and enable the systemd service
+sudo cp etc/systemd/system/wan-healthcheck.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable wan-healthcheck.service
+sudo systemctl start wan-healthcheck.service
+
+# Monitor health check logs
+sudo journalctl -u wan-healthcheck.service -f
+```
+
+The health check monitors WAN2 connectivity and automatically triggers failover when failures are detected, while keeping the interface up for local access.
+
 ## Monitoring and Troubleshooting
 
 ### Check Active Routes
@@ -193,12 +285,29 @@ sudo conntrack -L
 ```
 
 ### Test Failover
+
+**Using the failover control script (recommended):**
 ```bash
-# Simulate WAN2 failure
+# Trigger failover while keeping interface up
+sudo ./failover-control.sh failover
+
+# Verify traffic switches to WAN1 but gateway remains reachable
+ip route get 8.8.8.8
+ping 192.168.8.1  # Should still work!
+
+# Restore WAN2
+sudo ./failover-control.sh restore
+```
+
+**Using interface down (not recommended if you need local access):**
+```bash
+# Simulate WAN2 failure by taking interface down
 sudo ip link set enp8s0 down
 
 # Verify traffic switches to WAN1
 ip route get 8.8.8.8
+
+# Note: 192.168.8.1 will NOT be reachable with this method
 
 # Restore WAN2
 sudo ip link set enp8s0 up
