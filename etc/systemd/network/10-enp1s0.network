@@ -30,20 +30,16 @@ Table=main
 Priority=20
 
 [RoutingPolicyRule]
-# IPv6: Traffic TO LAN subnet must use main table (prevent policy routing responses)
-To=2a00:1f:c0:9bfa::/64
-Table=main
-Priority=20
-
-[RoutingPolicyRule]
-# IPv6 Primary: Route delegated prefix traffic via WAN2 (NAT66) - higher priority
-From=2a00:1f:c0:9bfa::/64
+# IPv6 Primary: Route traffic from LAN via WAN2 (NAT66) - higher priority
+IncomingInterface=enp1s0
+Family=ipv6
 Table=200
 Priority=100
 
 [RoutingPolicyRule]
-# IPv6 Fallback: Use WAN1 (native) if WAN2 is down - lower priority
-From=2a00:1f:c0:9bfa::/64
+# IPv6 Fallback: Route traffic from LAN via WAN1 (native) if WAN2 is down - lower priority
+IncomingInterface=enp1s0
+Family=ipv6
 Table=100
 Priority=200
 
