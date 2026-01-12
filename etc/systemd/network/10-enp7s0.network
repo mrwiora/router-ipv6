@@ -27,8 +27,13 @@ UseAutonomousPrefix=no
 RouteTable=100
 
 [Route]
-# Add default route to table 100 (fallback)
+# IPv6: Add default route to table 100 (fallback)
 Gateway=_dhcp6
 Table=100
 Metric=300
 
+[Route]
+# IPv4: Add default route to table 100 (fallback via enp7s0)
+Gateway=172.17.254.1
+Table=100
+Metric=300

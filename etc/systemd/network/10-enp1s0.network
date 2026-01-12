@@ -24,14 +24,25 @@ Assign=yes
 Token=::1
 
 [RoutingPolicyRule]
-# Primary: Route delegated prefix traffic via WAN2 (NAT66) - higher priority
+# IPv6 Primary: Route delegated prefix traffic via WAN2 (NAT66) - higher priority
 From=2a00:1f:c0:9bfa::/64
 Table=200
 Priority=100
 
 [RoutingPolicyRule]
-# Fallback: Use WAN1 (native) if WAN2 is down - lower priority
+# IPv6 Fallback: Use WAN1 (native) if WAN2 is down - lower priority
 From=2a00:1f:c0:9bfa::/64
 Table=100
 Priority=200
 
+[RoutingPolicyRule]
+# IPv4 Primary: Route LAN traffic via WAN2 (enp8s0) - higher priority
+From=172.17.0.0/24
+Table=200
+Priority=100
+
+[RoutingPolicyRule]
+# IPv4 Fallback: Use WAN1 (enp7s0) if WAN2 is down - lower priority
+From=172.17.0.0/24
+Table=100
+Priority=200
