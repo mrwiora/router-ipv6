@@ -24,6 +24,20 @@ Assign=yes
 Token=::1
 
 [RoutingPolicyRule]
+# IPv4: Keep local LAN traffic on LAN (highest priority)
+From=172.17.0.0/24
+To=172.17.0.0/24
+Table=main
+Priority=50
+
+[RoutingPolicyRule]
+# IPv6: Keep local LAN traffic on LAN (highest priority)
+From=2a00:1f:c0:9bfa::/64
+To=2a00:1f:c0:9bfa::/64
+Table=main
+Priority=50
+
+[RoutingPolicyRule]
 # IPv6 Primary: Route delegated prefix traffic via WAN2 (NAT66) - higher priority
 From=2a00:1f:c0:9bfa::/64
 Table=200
