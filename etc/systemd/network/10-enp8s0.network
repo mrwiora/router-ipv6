@@ -3,7 +3,9 @@ Name=enp8s0
 
 [Network]
 # WAN2 - Primary route with NAT66
-DHCP=yes
+DHCP=ipv6
+Address=192.168.8.102/24
+Gateway=192.168.8.1
 IPv6AcceptRA=yes
 IPv6Forwarding=yes
 

@@ -3,7 +3,9 @@ Name=enp7s0
 
 [Network]
 # WAN1 with prefix delegation
-DHCP=yes
+DHCP=ipv6
+Address=172.17.254.102/24
+Gateway=172.17.254.1
 IPv6AcceptRA=yes
 IPv6Forwarding=yes
 
