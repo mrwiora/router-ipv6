@@ -13,8 +13,7 @@ IPv6Forwarding=yes
 # Use SLAAC for address assignment
 UseAutonomousPrefix=yes
 DHCPv6Client=no
-RouteTable=200
-RouteMetric=200
+UseRoutes=yes
 
 [Route]
 # IPv6: Add default route to table 200 (primary)

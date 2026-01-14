@@ -24,7 +24,7 @@ Assign=no
 [IPv6AcceptRA]
 DHCPv6Client=always
 UseAutonomousPrefix=no
-RouteTable=100
+UseRoutes=yes
 
 [Route]
 # IPv6: Add default route to table 100 (fallback)
