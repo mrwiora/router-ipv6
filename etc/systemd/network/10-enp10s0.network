@@ -1,0 +1,56 @@
+[Match]
+Name=enp10s0
+
+[Network]
+# LAN interface - advertises ONLY delegated prefix from WAN1
+# No ULA - clients get one address from delegated prefix
+Address=172.17.2.254/24
+IPv6AcceptRA=no
+IPv6SendRA=yes
+IPv6Forwarding=yes
+DHCPPrefixDelegation=yes
+
+[IPv6SendRA]
+# Enable router advertisements on LAN
+Managed=no
+OtherInformation=no
+RouterLifetimeSec=1800
+
+[DHCPPrefixDelegation]
+# Receive and advertise delegated prefix from WAN1
+SubnetId=2
+Announce=yes
+Assign=yes
+Token=::1
+
+[RoutingPolicyRule]
+# IPv4: Traffic TO LAN subnet must use main table (prevent policy routing responses)
+To=172.17.2.0/24
+Table=main
+Priority=20
+
+[RoutingPolicyRule]
+# IPv6 Primary: Route traffic from LAN via WAN2 (NAT66) - higher priority
+IncomingInterface=enp10s0
+Family=ipv6
+Table=200
+Priority=100
+
+[RoutingPolicyRule]
+# IPv6 Fallback: Route traffic from LAN via WAN1 (native) if WAN2 is down - lower priority
+IncomingInterface=enp10s0
+Family=ipv6
+Table=100
+Priority=200
+
+[RoutingPolicyRule]
+# IPv4 Primary: Route LAN traffic via WAN2 (enp8s0) - higher priority
+From=172.17.2.0/24
+Table=200
+Priority=100
+
+[RoutingPolicyRule]
+# IPv4 Fallback: Use WAN1 (enp7s0) if WAN2 is down - lower priority
+From=172.17.2.0/24
+Table=100
+Priority=200

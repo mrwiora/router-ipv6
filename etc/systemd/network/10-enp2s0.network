@@ -16,8 +16,26 @@ UseAddress=yes
 RouteMetric=300
 
 [DHCPv6PrefixDelegation]
-# Delegate subnet 0 to LAN
+# Delegate subnet 0 to enp1s0
 SubnetId=0
+Announce=no
+Assign=no
+
+[DHCPv6PrefixDelegation]
+# Delegate subnet 1 to enp9s0
+SubnetId=1
+Announce=no
+Assign=no
+
+[DHCPv6PrefixDelegation]
+# Delegate subnet 2 to enp10s0
+SubnetId=2
+Announce=no
+Assign=no
+
+[DHCPv6PrefixDelegation]
+# Delegate subnet 3 to enp11s0
+SubnetId=3
 Announce=no
 Assign=no
 
