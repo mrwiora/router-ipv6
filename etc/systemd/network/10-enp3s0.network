@@ -1,0 +1,28 @@
+[Match]
+Name=enp3s0
+
+[Network]
+# WAN2 - Primary route with NAT66
+DHCP=ipv6
+Address=192.168.8.102/24
+Gateway=192.168.8.1
+IPv6AcceptRA=yes
+IPv6Forwarding=yes
+
+[IPv6AcceptRA]
+# Use SLAAC for address assignment
+UseAutonomousPrefix=yes
+DHCPv6Client=no
+UseRoutes=yes
+
+[Route]
+# IPv6: Add default route to table 200 (primary)
+Gateway=_ipv6ra
+Table=200
+Metric=200
+
+[Route]
+# IPv4: Add default route to table 200 (primary via enp8s0)
+Gateway=192.168.8.1
+Table=200
+Metric=200
