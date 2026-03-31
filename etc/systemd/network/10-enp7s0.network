@@ -1,0 +1,9 @@
+[Match]
+Name=enp7s0
+
+[Network]
+# WAN interface - static configuration
+Address=10.89.223.12/29
+Gateway=10.89.223.9
+IPv6AcceptRA=no
+IPv6SendRA=no
